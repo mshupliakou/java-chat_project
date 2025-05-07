@@ -1,0 +1,41 @@
+#paneIcon{
+-fx-background-color :#ffffff;
+}
+.button{
+-fx-border-radius: 20;
+-fx-background-radius: 20;
+-fx-background-color: #1c4526;
+-fx-font-size: 15;
+-fx-font-family: Arial;
+-fx-text-fill: white;}
+
+.text-field{
+-fx-font-family: Arial;
+-fx-font-size: 15;
+}
+.password-field{
+-fx-font-family: Arial;
+-fx-font-size: 15;
+}
+.date-picker{
+-fx-font-family: Arial;
+-fx-font-size: 15;
+}
+.tool-bar{
+
+
+
+}
+.radio-button{
+-fx-font-family: Arial;
+-fx-font-size: 14;
+}
+#title{
+
+-fx-text-fill:#1c4526;
+-fx-font-size: 30;
+}
+.wrg{
+-fx-font-size: 12;
+-fx-text-fill:red;
+}

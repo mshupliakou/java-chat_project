@@ -1,0 +1,26 @@
+#mainPane{
+-fx-background-color : #ffffff;
+}
+#paneIcon{
+-fx-background-color :#1c4526;
+}
+.label{
+-fx-font-size: 15;
+-fx-text-fill:#23262f;
+}
+#title{
+-fx-font-family: "Inter", Arial, sans-serif;
+-fx-text-fill:white;
+-fx-font-size: 15;
+}
+.text-field{
+-fx-font-family: "Inter", Arial, sans-serif;
+-fx-font-size: 15;
+}
+.button{
+-fx-border-radius: 20;
+-fx-background-radius: 20;
+-fx-background-color: #1c4526;
+-fx-font-size: 15;
+-fx-font-family: "Inter", Arial, sans-serif;
+-fx-text-fill: white;}
