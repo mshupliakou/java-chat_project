@@ -11,35 +11,35 @@
 
 <AnchorPane fx:id="mainPane" prefHeight="600.0" prefWidth="900.0" stylesheets="@../css/login.css" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.javachat_project.MainController">
    <children>
-      <ImageView cache="true" cacheHint="QUALITY" fitHeight="600.0" fitWidth="496.0" pickOnBounds="true">
+      <ImageView cache="true" cacheHint="QUALITY" fitHeight="600.0" fitWidth="478.0" pickOnBounds="true">
          <image>
-            <Image url="@../img/new_version.png" />
+            <Image url="@../img/bg_option.JPG" />
          </image>
       </ImageView>
       <AnchorPane layoutX="468.0" layoutY="20.0" prefHeight="560.0" prefWidth="432.0">
          <children>
-            <ImageView cache="true" cacheHint="QUALITY" fitHeight="108.0" fitWidth="153.0" layoutX="202.0" layoutY="64.0" mouseTransparent="true" preserveRatio="true">
+            <ImageView cache="true" cacheHint="QUALITY" fitHeight="108.0" fitWidth="153.0" layoutX="208.0" layoutY="66.0" mouseTransparent="true" preserveRatio="true">
                <image>
                   <Image url="@../img/logo.PNG" />
                </image>
             </ImageView>
-            <Label id="label_log_in" cache="true" cacheHint="QUALITY" layoutX="114.0" layoutY="138.0" prefHeight="23.0" prefWidth="118.0" stylesheets="@../css/login.css" text="Welcome to ">
+            <Label id="label_log_in" cache="true" cacheHint="QUALITY" layoutX="120.0" layoutY="140.0" prefHeight="23.0" prefWidth="118.0" stylesheets="@../css/login.css" text="Welcome to ">
                <font>
                   <Font size="25.0" />
                </font>
             </Label>
-            <TextField fx:id="tfLogin" cacheHint="QUALITY" layoutX="86.0" layoutY="202.0" prefHeight="40.0" prefWidth="250.0" promptText="Login" />
-            <Label cache="true" cacheHint="QUALITY" layoutX="300.0" layoutY="179.0" opacity="0.65" prefHeight="22.0" prefWidth="38.0" stylesheets="@../css/login.css" text="Login">
+            <TextField fx:id="tfLogin" cacheHint="QUALITY" layoutX="92.0" layoutY="204.0" prefHeight="40.0" prefWidth="250.0" promptText="Login" />
+            <Label cache="true" cacheHint="QUALITY" layoutX="305.0" layoutY="181.0" opacity="0.65" prefHeight="22.0" prefWidth="38.0" stylesheets="@../css/login.css" text="Login">
                <font>
                   <Font name="Arial Black" size="12.0" />
                </font>
             </Label>
-            <Label cache="true" cacheHint="QUALITY" layoutX="274.0" layoutY="252.0" opacity="0.65" prefHeight="22.0" prefWidth="64.0" stylesheets="@../css/login.css" text="Password" />
-            <Button fx:id="btnLogin" cache="true" cacheHint="QUALITY" layoutX="86.0" layoutY="359.0" mnemonicParsing="false" onMouseClicked="#logIn" prefHeight="38.0" prefWidth="250.0" style="-fx-border-radius: 20; -fx-background-radius: 20; -fx-font-size: 15; -fx-font-family: Arial;" stylesheets="@../css/login.css" text="Log In" textFill="WHITE" />
-            <Button fx:id="btnSignUp" cache="true" cacheHint="QUALITY" layoutX="86.0" layoutY="435.0" mnemonicParsing="false" onMouseClicked="#signUp" prefHeight="38.0" prefWidth="250.0" stylesheets="@../css/login.css" text="Sign Up" textFill="WHITE" />
-            <Label id="label_advice" cache="true" cacheHint="QUALITY" layoutX="96.0" layoutY="419.0" opacity="0.65" stylesheets="@../../../../../../../gitHub/java/my_final_project/src/main/resources/com/example/my_final_project/logining.css" text="You are not signed up? Create an account!" />
-            <PasswordField fx:id="tfPassword" cacheHint="QUALITY" layoutX="86.0" layoutY="275.0" prefHeight="40.0" prefWidth="250.0" promptText="Password" />
-            <Label id="loginWrg" fx:id="loginWrg" layoutX="96.0" layoutY="397.0" prefHeight="22.0" prefWidth="230.0" stylesheets="@../css/login.css" />
+            <Label cache="true" cacheHint="QUALITY" layoutX="280.0" layoutY="254.0" opacity="0.65" prefHeight="22.0" prefWidth="64.0" stylesheets="@../css/login.css" text="Password" />
+            <Button fx:id="btnLogin" cache="true" cacheHint="QUALITY" layoutX="92.0" layoutY="361.0" mnemonicParsing="false" onMouseClicked="#logIn" prefHeight="38.0" prefWidth="250.0" style="-fx-border-radius: 20; -fx-background-radius: 20; -fx-font-size: 15; -fx-font-family: Arial;" stylesheets="@../css/login.css" text="Log In" textFill="WHITE" />
+            <Button fx:id="btnSignUp" cache="true" cacheHint="QUALITY" layoutX="92.0" layoutY="437.0" mnemonicParsing="false" onMouseClicked="#signUp" prefHeight="38.0" prefWidth="250.0" stylesheets="@../css/login.css" text="Sign Up" textFill="WHITE" />
+            <Label id="label_advice" cache="true" cacheHint="QUALITY" layoutX="102.0" layoutY="421.0" opacity="0.65" stylesheets="@../../../../../../../gitHub/java/my_final_project/src/main/resources/com/example/my_final_project/logining.css" text="You are not signed up? Create an account!" />
+            <PasswordField fx:id="tfPassword" cacheHint="QUALITY" layoutX="92.0" layoutY="277.0" prefHeight="40.0" prefWidth="250.0" promptText="Password" />
+            <Label id="loginWrg" fx:id="loginWrg" layoutX="102.0" layoutY="399.0" prefHeight="22.0" prefWidth="230.0" stylesheets="@../css/login.css" />
          </children>
       </AnchorPane>
    </children>

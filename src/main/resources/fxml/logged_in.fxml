@@ -1,16 +1,28 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ListView?>
 <?import javafx.scene.control.SplitPane?>
+<?import javafx.scene.control.TextField?>
 <?import javafx.scene.layout.AnchorPane?>
 
+<AnchorPane id="main" prefHeight="600.0" prefWidth="900.0" stylesheets="@../css/loggen_in.css" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.javachat_project.LoggedInController">
+    <children>
+        <SplitPane dividerPositions="0.45" prefHeight="600.0" prefWidth="900.0" stylesheets="@../css/loggen_in.css" AnchorPane.bottomAnchor="0" AnchorPane.leftAnchor="0" AnchorPane.rightAnchor="0" AnchorPane.topAnchor="0">
+            <items>
+                <AnchorPane maxWidth="410.0" minWidth="120.0" prefWidth="410.0" stylesheets="@../css/loggen_in.css">
+                    <children>
+                        <TextField fx:id="search" layoutX="14.0" layoutY="14.0" onAction="#handleEnter" prefHeight="30.0" promptText="Search" stylesheets="@../css/loggen_in.css" AnchorPane.leftAnchor="14.0" AnchorPane.rightAnchor="14.799999999999955" AnchorPane.topAnchor="14.0" />
 
-<AnchorPane prefHeight="600.0" prefWidth="900.0" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.javachat_project.LoggedInController">
-   <children>
-      <SplitPane dividerPositions="0.32969723953695457" layoutX="-2.0" prefHeight="600.0" prefWidth="900.0">
-        <items>
-          <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="160.0" prefWidth="100.0" />
-          <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="598.0" prefWidth="618.0" />
-        </items>
-      </SplitPane>
-   </children>
+                        <ListView fx:id="chatListView" stylesheets="@../css/loggen_in.css" AnchorPane.bottomAnchor="0" AnchorPane.leftAnchor="0" AnchorPane.rightAnchor="0" AnchorPane.topAnchor="60" />
+                    </children>
+                </AnchorPane>
+                
+                <AnchorPane id="chat_holder" prefWidth="490.0" stylesheets="@../css/loggen_in.css">
+               <children>
+                  <Label id="helping_label" layoutX="140.0" layoutY="274.0" prefHeight="50.0" prefWidth="212.0" stylesheets="@../css/loggen_in.css" text="Choose a chat to begin" />
+               </children></AnchorPane>
+            </items>
+        </SplitPane>
+    </children>
 </AnchorPane>

@@ -26,7 +26,7 @@ public class SignController {
     private Connection remoteConnection;
 
     public void initialize() {
-        localConnection = DBConnection.getConnection();
+        //localConnection = DBConnection.getConnection();
         remoteConnection = SupabaseConnect.getConnection();
     }
 
@@ -71,7 +71,7 @@ public class SignController {
 
         try (
                 PreparedStatement pstRemote = remoteConnection.prepareStatement(insertSQL);
-                PreparedStatement pstLocal = localConnection.prepareStatement(insertSQL);
+                //PreparedStatement pstLocal = localConnection.prepareStatement(insertSQL);
         ) {
             pstRemote.setString(1, name);
             pstRemote.setString(2, lastName);
@@ -79,11 +79,11 @@ public class SignController {
             pstRemote.setString(4, password);
             pstRemote.executeUpdate();
 
-            pstLocal.setString(1, name);
-            pstLocal.setString(2, lastName);
-            pstLocal.setString(3, login);
-            pstLocal.setString(4, password);
-            pstLocal.executeUpdate();
+//            pstLocal.setString(1, name);
+//            pstLocal.setString(2, lastName);
+//            pstLocal.setString(3, login);
+//            pstLocal.setString(4, password);
+//            pstLocal.executeUpdate();
 
 
             tfName.getScene().getWindow().hide();

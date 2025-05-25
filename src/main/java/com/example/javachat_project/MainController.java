@@ -24,6 +24,7 @@ public class MainController {
     @FXML private TextField tfPassword;
     @FXML private TextField tfLogin;
     @FXML private Label loginWrg;
+    private long myId;
     public void signUp(MouseEvent mouseEvent) {
         Parent root = null;
         try {
@@ -66,6 +67,7 @@ public class MainController {
 
             try (ResultSet rs = pst.executeQuery()) {
                 if (rs.next()) {
+                    myId = rs.getLong("id");
                     return true;
                 } else {
                     loginWrg.setText("Incorrect login or password!");
@@ -85,6 +87,9 @@ public class MainController {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/logged_in.fxml"));
             Parent root = loader.load();
 
+            LoggedInController loggedInController = loader.getController();
+
+            loggedInController.setCurrentUserId(myId);
             Stage stage = (Stage) ((Node) mouseEvent.getSource()).getScene().getWindow();
 
             Scene scene = new Scene(root);
@@ -98,4 +103,6 @@ public class MainController {
             e.printStackTrace();
         }
     }
+
+
 }

@@ -32,12 +32,7 @@
     -fx-effect: null;
 }
 
-/*
-.text-field:hover {
-    -fx-effect: dropshadow(gaussian, #38a169, 10, 0.2, 0, 0);
-}
 
-*/
 .text-field:focused {
     -fx-effect: dropshadow(gaussian, #38a169, 12, 0.3, 0, 0);
     -fx-border-color: #38a169;
