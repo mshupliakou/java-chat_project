@@ -1,49 +1,44 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import javafx.scene.control.Button?>
-<?import javafx.scene.control.DatePicker?>
 <?import javafx.scene.control.Label?>
-<?import javafx.scene.control.RadioButton?>
+<?import javafx.scene.control.PasswordField?>
 <?import javafx.scene.control.TextField?>
-<?import javafx.scene.control.ToggleGroup?>
 <?import javafx.scene.image.Image?>
 <?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.Pane?>
+<?import javafx.scene.text.Font?>
 
-
-<AnchorPane prefHeight="550.0" prefWidth="400.0" style="-fx-background-color: ffffff;" stylesheets="@../css/sign.css" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.javachat_project.SignController">
+<AnchorPane prefHeight="600.0" prefWidth="400.0" style="-fx-background-color: ffffff;" stylesheets="@../css/sign.css" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.javachat_project.SignController">
    <children>
       <Pane id="paneIcon" layoutY="14.0" prefHeight="99.0" prefWidth="400.0" stylesheets="@../css/sign.css">
          <children>
-            <ImageView cache="true" cacheHint="QUALITY" depthTest="ENABLE" fitHeight="99.0" fitWidth="124.0" layoutX="200.0" layoutY="3.0" pickOnBounds="true" preserveRatio="true">
+            <ImageView cache="true" cacheHint="QUALITY" depthTest="ENABLE" fitHeight="99.0" fitWidth="124.0" layoutX="252.0" layoutY="3.0" pickOnBounds="true" preserveRatio="true">
                <image>
                   <Image url="@../img/logo.PNG" />
                </image>
             </ImageView>
-            <Label id="title" cache="true" layoutX="100.0" layoutY="27.0" prefHeight="45.0" prefWidth="124.0" stylesheets="@../css/sign.css" text="Sign Up" />
+            <Label id="label_log_in" cache="true" cacheHint="QUALITY" layoutX="51.0" layoutY="27.0" prefHeight="45.0" prefWidth="208.0" stylesheets="@../css/sign.css" text="Create an account">
+               <font>
+                  <Font size="25.0" />
+               </font>
+            </Label>
          </children>
       </Pane>
-      <TextField fx:id="tfName" layoutX="36.0" layoutY="113.0" prefHeight="35.0" prefWidth="150.0" promptText="Firstname" stylesheets="@../css/sign.css" />
-      <TextField fx:id="tfLastName" layoutX="210.0" layoutY="113.0" prefHeight="35.0" prefWidth="150.0" promptText="Lastname" stylesheets="@../css/sign.css" />
-      <TextField fx:id="tfLogin" layoutX="36.0" layoutY="166.0" prefHeight="35.0" prefWidth="325.0" promptText="Login" stylesheets="@../css/sign.css" />
-      <DatePicker layoutX="35.0" layoutY="376.0" prefHeight="35.0" prefWidth="325.0" promptText="Birthday" stylesheets="@../css/sign.css" />
-      <Button fx:id="SignUp" layoutX="96.0" layoutY="468.0" mnemonicParsing="false" onMouseClicked="#signUp" prefHeight="35.0" prefWidth="208.0" stylesheets="@../css/sign.css" text="Sign Up" />
-      <TextField fx:id="tfConfirmPassword" layoutX="35.0" layoutY="323.0" prefHeight="35.0" prefWidth="325.0" promptText="Confirm Password" stylesheets="@../css/sign.css" />
-      <TextField fx:id="tfPassword" layoutX="35.0" layoutY="272.0" prefHeight="35.0" prefWidth="325.0" promptText="Password" stylesheets="@../css/sign.css" />
-      <TextField fx:id="tfMail" layoutX="35.0" layoutY="219.0" prefHeight="35.0" prefWidth="326.0" promptText="Mail" stylesheets="@../css/sign.css" />
-      <RadioButton layoutX="58.0" layoutY="425.0" mnemonicParsing="false" prefHeight="19.0" prefWidth="61.0" stylesheets="@../css/sign.css" text="Male">
-         <toggleGroup>
-            <ToggleGroup fx:id="sex" />
-         </toggleGroup>
-      </RadioButton>
-      <RadioButton layoutX="163.0" layoutY="425.0" mnemonicParsing="false" stylesheets="@../css/sign.css" text="Female" toggleGroup="$sex" />
-      <RadioButton layoutX="279.0" layoutY="425.0" mnemonicParsing="false" stylesheets="@../css/sign.css" text="Other" toggleGroup="$sex" />
-      <Label fx:id="nameWrg" layoutX="36.0" layoutY="148.0" prefHeight="18.0" prefWidth="326.0" styleClass="wrg" stylesheets="@../css/sign.css" />
-      <Label fx:id="loginWrg" layoutX="37.0" layoutY="201.0" prefHeight="18.0" prefWidth="326.0" styleClass="wrg" stylesheets="@../css/sign.css" />
-      <Label fx:id="mailWrg" layoutX="37.0" layoutY="254.0" prefHeight="18.0" prefWidth="326.0" styleClass="wrg" stylesheets="@../css/sign.css" />
-      <Label fx:id="passwordWrg" layoutX="36.0" layoutY="307.0" prefHeight="18.0" prefWidth="326.0" styleClass="wrg" stylesheets="@../css/sign.css" />
-      <Label fx:id="confirmWrg" layoutX="36.0" layoutY="358.0" prefHeight="18.0" prefWidth="326.0" styleClass="wrg" stylesheets="@../css/sign.css" />
-      <Label fx:id="chosenWrg" layoutX="37.0" layoutY="444.0" prefHeight="18.0" prefWidth="326.0" styleClass="wrg" stylesheets="@../css/sign.css" />
+      <TextField fx:id="tfName" layoutX="36.0" layoutY="162.0" prefHeight="35.0" prefWidth="150.0" promptText="Firstname" stylesheets="@../css/sign.css" />
+      <TextField fx:id="tfLastName" layoutX="213.0" layoutY="162.0" prefHeight="35.0" prefWidth="150.0" promptText="Lastname" stylesheets="@../css/sign.css" />
+      <TextField fx:id="tfLogin" layoutX="38.0" layoutY="215.0" prefHeight="35.0" prefWidth="326.0" promptText="Login" stylesheets="@../css/sign.css" />
+      <Button fx:id="SignUp" cache="true" cacheHint="QUALITY" layoutX="95.0" layoutY="497.0" mnemonicParsing="false" onMouseClicked="#signUp" prefHeight="35.0" prefWidth="208.0" stylesheets="@../css/sign.css" text="Sign Up" />
+      <Label fx:id="nameWrg" layoutX="36.0" layoutY="197.0" prefHeight="18.0" prefWidth="326.0" styleClass="wrg" stylesheets="@../css/sign.css" />
+      <Label fx:id="loginWrg" layoutX="38.0" layoutY="250.0" prefHeight="18.0" prefWidth="326.0" styleClass="wrg" stylesheets="@../css/sign.css" />
+      <Label fx:id="passwordWrg" layoutX="37.0" layoutY="361.0" prefHeight="18.0" prefWidth="326.0" styleClass="wrg" stylesheets="@../css/sign.css" />
+      <Label fx:id="confirmWrg" layoutX="38.0" layoutY="361.0" prefHeight="18.0" prefWidth="326.0" styleClass="wrg" stylesheets="@../css/sign.css" />
+      <Label fx:id="chosenWrg" layoutX="38.0" layoutY="415.0" prefHeight="18.0" prefWidth="326.0" styleClass="wrg" stylesheets="@../css/sign.css" />
+      <PasswordField fx:id="tfPassword" layoutX="38.0" layoutY="322.0" prefHeight="35.0" prefWidth="326.0" promptText="Password" />
+      <PasswordField fx:id="tfConfirmPassword" layoutX="38.0" layoutY="380.0" prefHeight="35.0" prefWidth="326.0" promptText="Confirm password" />
+      <Label cache="true" cacheHint="QUALITY" layoutX="78.0" layoutY="132.0" opacity="0.65" prefHeight="22.0" prefWidth="242.0" stylesheets="@../css/login.css" text="Enter your name and choose a login" />
+      <Label cache="true" cacheHint="QUALITY" layoutX="129.0" layoutY="293.0" opacity="0.65" prefHeight="22.0" prefWidth="141.0" stylesheets="@../css/login.css" text="Choose a password" />
+      <Label cache="true" cacheHint="QUALITY" layoutX="83.0" layoutY="467.0" opacity="0.65" prefHeight="22.0" prefWidth="234.0" stylesheets="@../css/login.css" text="Are you ready? Create an account!" />
    </children>
 </AnchorPane>

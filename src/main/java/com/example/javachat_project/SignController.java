@@ -1,7 +1,9 @@
 package com.example.javachat_project;
 
+import com.example.javachat_project.DB.SupabaseConnect;
 import javafx.fxml.FXML;
 import javafx.scene.control.Label;
+import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 import javafx.scene.input.MouseEvent;
 import com.example.javachat_project.DB.DBConnection;
@@ -9,126 +11,104 @@ import com.example.javachat_project.DB.DBConnection;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
-
 public class SignController {
-    @FXML
-    private Label loginWrg;
-    @FXML
-    private Label confirmWrg;
-    @FXML
-    private Label passwordWrg;
-    @FXML
-    private Label nameWrg;
-    @FXML
-    private TextField tfLastName;
-    @FXML
-    private TextField tfLogin;
-    @FXML
-    private TextField tfConfirmPassword;
-    @FXML
-    private TextField tfPassword;
-    @FXML
-    private TextField tfMail;
-    @FXML
-    private TextField tfName;
+    @FXML private Label loginWrg;
+    @FXML private Label confirmWrg;
+    @FXML private Label passwordWrg;
+    @FXML private Label nameWrg;
+    @FXML private TextField tfLastName;
+    @FXML private TextField tfLogin;
+    @FXML private PasswordField tfConfirmPassword;
+    @FXML private PasswordField tfPassword;
+    @FXML private TextField tfName;
 
+    private Connection localConnection;
+    private Connection remoteConnection;
 
-
-    private Connection con;
     public void initialize() {
-        con = DBConnection.getConnection();
+        localConnection = DBConnection.getConnection();
+        remoteConnection = SupabaseConnect.getConnection();
     }
-    private boolean checkTheName(String firstName){
-        if (firstName.length() > 20) {
-            nameWrg.setText("The name is too long!");
+
+    private boolean isValidString(String input, int maxLength, Label errorLabel, String fieldName) {
+        if (input == null || input.isEmpty()) {
+            errorLabel.setText("Please enter " + fieldName + "!");
             return false;
         }
-        else if(firstName.isEmpty()){
-            nameWrg.setText("Please enter the name!");
+        if (input.length() > maxLength) {
+            errorLabel.setText(fieldName + " is too long!");
             return false;
         }
-        String possible_signs = "1234567890QWERTYUIOPASDFGHJKLZXCVBNMqwertyuiopasdfghjklzxcvbnm_";
-        for (char value : firstName.toCharArray()) {
-            if (!possible_signs.contains(String.valueOf(value))) {
-                nameWrg.setText("You can not use those signs! Please change the name!");
-                return false;
-            }
+        if (!input.matches("[\\w\\d_]+")) {
+            errorLabel.setText("Invalid characters in " + fieldName + "!");
+            return false;
         }
-        return  true;
+        errorLabel.setText("");
+        return true;
     }
-    private boolean checkTheLogin(String login){
-        if (login.length() > 20) {
-            loginWrg.setText("The login is too long!");
-            return false;
-        }
-        else if(login.isEmpty()){
-            loginWrg.setText("Please enter the login!");
-            return false;
-        }
-        String possible_signs = "1234567890QWERTYUIOPASDFGHJKLZXCVBNMqwertyuiopasdfghjklzxcvbnm_";
-        for (char value : login.toCharArray()) {
-            if (!possible_signs.contains(String.valueOf(value))) {
-                loginWrg.setText("You can not use those signs! Please change the login!");
-                return false;
-            }
-        }
-        return  true;
-    }
-    private boolean checkPassword(String password, String confirmPassword){
-        if (password.length() > 20) {
-            passwordWrg.setText("The password is too long!");
-            return false;
-        }
-        else if(password.isEmpty()){
+
+    private boolean validatePasswords(String password, String confirmPassword) {
+        if (password == null || password.isEmpty()) {
             passwordWrg.setText("Please enter the password!");
             return false;
         }
-        else if(!password.equals(confirmPassword)){
-            confirmWrg.setText("The password you have entered are different!");
+        if (password.length() > 20) {
+            passwordWrg.setText("Password is too long!");
             return false;
         }
-        return  true;
+        if (!password.equals(confirmPassword)) {
+            confirmWrg.setText("Passwords do not match!");
+            return false;
+        }
+        passwordWrg.setText("");
+        confirmWrg.setText("");
+        return true;
     }
-    private void date_base(){
-        String insert = "INSERT INTO personInfo(name, last_name, login, password) Values (?,?,?,?)";
-        try {
-            PreparedStatement pst = con.prepareStatement(insert);
-            pst.setString(1, tfName.getText());
-            pst.setString(2, tfLastName.getText());
-            pst.setString(3, tfLogin.getText());
-            pst.setString(4, tfPassword.getText());
-            pst.executeUpdate();
-            tfMail.getScene().getWindow().hide();
+
+    private void insertUserIntoDatabase(String name, String lastName, String login, String password) {
+        String insertSQL = "INSERT INTO personInfo(name, last_name, login, password) VALUES (?, ?, ?, ?)";
+        // TODO: hash passwords are needed
+
+        try (
+                PreparedStatement pstRemote = remoteConnection.prepareStatement(insertSQL);
+                PreparedStatement pstLocal = localConnection.prepareStatement(insertSQL);
+        ) {
+            pstRemote.setString(1, name);
+            pstRemote.setString(2, lastName);
+            pstRemote.setString(3, login);
+            pstRemote.setString(4, password);
+            pstRemote.executeUpdate();
+
+            pstLocal.setString(1, name);
+            pstLocal.setString(2, lastName);
+            pstLocal.setString(3, login);
+            pstLocal.setString(4, password);
+            pstLocal.executeUpdate();
+
+
+            tfName.getScene().getWindow().hide();
         } catch (SQLException e) {
             e.printStackTrace();
         }
     }
 
-    public void signUp(MouseEvent mouseEvent) {
+    public void signUp(MouseEvent event) {
         nameWrg.setText("");
         loginWrg.setText("");
         passwordWrg.setText("");
         confirmWrg.setText("");
+
+        String name = tfName.getText();
+        String lastName = tfLastName.getText();
         String login = tfLogin.getText();
         String password = tfPassword.getText();
         String confirmPassword = tfConfirmPassword.getText();
-        String firstName = tfName.getText();
-        String lastName = tfLastName.getText();
-        String mail = tfMail.getText();
-        if(!checkTheName(firstName)){
-            return;
-        }
-        if(!checkTheName(lastName)){
-            return;
-        }
-        if(!checkTheLogin(login)){
-            return;
-        }
-        if(!checkPassword(password, confirmPassword)){
-            return;
-        }
-        date_base();
 
+        if (!isValidString(name, 20, nameWrg, "Name")) return;
+        if (!isValidString(lastName, 20, nameWrg, "Last name")) return;
+        if (!isValidString(login, 20, loginWrg, "Login")) return;
+        if (!validatePasswords(password, confirmPassword)) return;
 
+        insertUserIntoDatabase(name, lastName, login, password);
     }
 }

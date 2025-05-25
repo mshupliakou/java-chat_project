@@ -1,41 +1,88 @@
-#paneIcon{
--fx-background-color :#ffffff;
+#paneIcon {
+    -fx-background-color: #ffffff;
 }
-.button{
--fx-border-radius: 20;
--fx-background-radius: 20;
--fx-background-color: #1c4526;
--fx-font-size: 15;
--fx-font-family: Arial;
--fx-text-fill: white;}
 
-.text-field{
--fx-font-family: Arial;
--fx-font-size: 15;
-}
-.password-field{
--fx-font-family: Arial;
--fx-font-size: 15;
-}
-.date-picker{
--fx-font-family: Arial;
--fx-font-size: 15;
-}
-.tool-bar{
+.button {
+    -fx-border-radius: 20;
+    -fx-background-radius: 20;
+    -fx-background-color: #1c4526;
+    -fx-font-size: 15;
+    -fx-font-family: Arial;
+    -fx-text-fill: white;
 
 
+    -fx-transition: all 0.3s ease;
+    -fx-effect: dropshadow(gaussian, transparent, 0, 0, 0, 0);
+    -fx-cursor: hand;
+}
 
-}
-.radio-button{
--fx-font-family: Arial;
--fx-font-size: 14;
-}
-#title{
 
--fx-text-fill:#1c4526;
--fx-font-size: 30;
+.button:hover {
+    -fx-effect: dropshadow(gaussian, #3aa456, 10, 0.5, 0, 0);
+    -fx-background-color: #246732;
 }
-.wrg{
--fx-font-size: 12;
--fx-text-fill:red;
+
+
+.button:pressed {
+    -fx-effect: dropshadow(gaussian, #2e8b38, 15, 0.7, 0, 0);
+    -fx-background-color: #1a3b19;
+}
+
+.text-field {
+    -fx-font-family: "Inter", Arial, sans-serif;
+    -fx-font-size: 15;
+    -fx-padding: 6;
+    -fx-border-radius: 5;
+    -fx-background-radius: 5;
+    -fx-background-color: white;
+    -fx-border-color: #ccc;
+    -fx-effect: null;
+}
+
+/*
+.text-field:hover {
+    -fx-effect: dropshadow(gaussian, #38a169, 10, 0.2, 0, 0);
+}
+
+*/
+.text-field:focused {
+    -fx-effect: dropshadow(gaussian, #38a169, 12, 0.3, 0, 0);
+    -fx-border-color: #38a169;
+}
+
+.password-field {
+    -fx-font-family: Arial;
+    -fx-font-size: 15;
+}
+
+.date-picker {
+    -fx-font-family: Arial;
+    -fx-font-size: 15;
+}
+
+.tool-bar {
+}
+
+.radio-button {
+    -fx-font-family: Arial;
+    -fx-font-size: 14;
+}
+
+#title {
+    -fx-text-fill: #1c4526;
+    -fx-font-size: 30;
+}
+
+.wrg {
+    -fx-font-size: 12;
+    -fx-text-fill: red;
+}
+#label_log_in{
+ -fx-font-smoothing-type: gray;
+    -fx-font-family: "Inter", Arial, sans-serif;
+    -fx-text-fill: black;
+    -fx-font-size: 25;
+
+
+
 }

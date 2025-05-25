@@ -2,49 +2,44 @@
 
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Label?>
+<?import javafx.scene.control.PasswordField?>
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.image.Image?>
 <?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.AnchorPane?>
-<?import javafx.scene.layout.Pane?>
 <?import javafx.scene.text.Font?>
-
 
 <AnchorPane fx:id="mainPane" prefHeight="600.0" prefWidth="900.0" stylesheets="@../css/login.css" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.javachat_project.MainController">
    <children>
-      <Pane fx:id="paneIcon" prefHeight="40.0" prefWidth="900.0" stylesheets="@../css/login.css">
-         <children>
-            <Label id="title" layoutX="14.0" layoutY="12.0" prefHeight="21.0" prefWidth="235.0" stylesheets="@../css/login.css" text="Welcome to Echo! Please Log in" />
-         </children>
-      </Pane>
-      <ImageView fitHeight="560.0" fitWidth="439.0" layoutY="40.0" pickOnBounds="true" preserveRatio="true">
+      <ImageView cache="true" cacheHint="QUALITY" fitHeight="600.0" fitWidth="496.0" pickOnBounds="true">
          <image>
-            <Image url="@../img/background_img.png" />
+            <Image url="@../img/new_version.png" />
          </image>
       </ImageView>
-      <AnchorPane layoutX="432.0" layoutY="40.0" prefHeight="560.0" prefWidth="468.0">
+      <AnchorPane layoutX="468.0" layoutY="20.0" prefHeight="560.0" prefWidth="432.0">
          <children>
-            <ImageView cache="true" fitHeight="108.0" fitWidth="153.0" layoutX="220.0" layoutY="56.0" pickOnBounds="true" preserveRatio="true">
+            <ImageView cache="true" cacheHint="QUALITY" fitHeight="108.0" fitWidth="153.0" layoutX="202.0" layoutY="64.0" mouseTransparent="true" preserveRatio="true">
                <image>
                   <Image url="@../img/logo.PNG" />
                </image>
             </ImageView>
-            <Label id="label_log_in" layoutX="125.0" layoutY="131.0" prefHeight="23.0" prefWidth="118.0" stylesheets="@../../../../../../../gitHub/java/my_final_project/src/main/resources/com/example/my_final_project/logining.css" text="Welcome to ">
+            <Label id="label_log_in" cache="true" cacheHint="QUALITY" layoutX="114.0" layoutY="138.0" prefHeight="23.0" prefWidth="118.0" stylesheets="@../css/login.css" text="Welcome to ">
                <font>
                   <Font size="25.0" />
                </font>
             </Label>
-            <TextField layoutX="104.0" layoutY="194.0" prefHeight="40.0" prefWidth="250.0" promptText="Login" />
-            <TextField layoutX="104.0" layoutY="267.0" prefHeight="40.0" prefWidth="250.0" promptText="Password" />
-            <Label layoutX="313.0" layoutY="172.0" opacity="0.65" prefHeight="22.0" prefWidth="42.0" stylesheets="@../css/login.css" text="Login">
+            <TextField fx:id="tfLogin" cacheHint="QUALITY" layoutX="86.0" layoutY="202.0" prefHeight="40.0" prefWidth="250.0" promptText="Login" />
+            <Label cache="true" cacheHint="QUALITY" layoutX="300.0" layoutY="179.0" opacity="0.65" prefHeight="22.0" prefWidth="38.0" stylesheets="@../css/login.css" text="Login">
                <font>
                   <Font name="Arial Black" size="12.0" />
                </font>
             </Label>
-            <Label layoutX="287.0" layoutY="245.0" opacity="0.65" prefHeight="22.0" prefWidth="68.0" stylesheets="@../css/login.css" text="Password" />
-            <Button fx:id="btnLogin" layoutX="104.0" layoutY="351.0" mnemonicParsing="false" prefHeight="38.0" prefWidth="250.0" style="-fx-border-radius: 20; -fx-background-radius: 20; -fx-font-size: 15; -fx-font-family: Arial;" stylesheets="@../css/login.css" text="Log In" textFill="WHITE" />
-            <Button fx:id="btnSignUp" onMouseClicked="#signUp" layoutX="104.0" layoutY="427.0" mnemonicParsing="false" prefHeight="38.0" prefWidth="250.0" stylesheets="@../css/login.css" text="Sign Up" textFill="WHITE" />
-            <Label id="label_advice" layoutX="119.0" layoutY="405.0" opacity="0.65" stylesheets="@../../../../../../../gitHub/java/my_final_project/src/main/resources/com/example/my_final_project/logining.css" text="You are not signed up? Create an account!" />
+            <Label cache="true" cacheHint="QUALITY" layoutX="274.0" layoutY="252.0" opacity="0.65" prefHeight="22.0" prefWidth="64.0" stylesheets="@../css/login.css" text="Password" />
+            <Button fx:id="btnLogin" cache="true" cacheHint="QUALITY" layoutX="86.0" layoutY="359.0" mnemonicParsing="false" onMouseClicked="#logIn" prefHeight="38.0" prefWidth="250.0" style="-fx-border-radius: 20; -fx-background-radius: 20; -fx-font-size: 15; -fx-font-family: Arial;" stylesheets="@../css/login.css" text="Log In" textFill="WHITE" />
+            <Button fx:id="btnSignUp" cache="true" cacheHint="QUALITY" layoutX="86.0" layoutY="435.0" mnemonicParsing="false" onMouseClicked="#signUp" prefHeight="38.0" prefWidth="250.0" stylesheets="@../css/login.css" text="Sign Up" textFill="WHITE" />
+            <Label id="label_advice" cache="true" cacheHint="QUALITY" layoutX="96.0" layoutY="419.0" opacity="0.65" stylesheets="@../../../../../../../gitHub/java/my_final_project/src/main/resources/com/example/my_final_project/logining.css" text="You are not signed up? Create an account!" />
+            <PasswordField fx:id="tfPassword" cacheHint="QUALITY" layoutX="86.0" layoutY="275.0" prefHeight="40.0" prefWidth="250.0" promptText="Password" />
+            <Label id="loginWrg" fx:id="loginWrg" layoutX="96.0" layoutY="397.0" prefHeight="22.0" prefWidth="230.0" stylesheets="@../css/login.css" />
          </children>
       </AnchorPane>
    </children>
