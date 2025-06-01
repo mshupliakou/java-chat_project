@@ -64,7 +64,7 @@ public class LoggedInController {
                     long otherUserId = rs.getLong("other_user_id");
 
                     // Query to get user info for the other user in the chat
-                    String loginQuery = "SELECT login, last_name, name FROM personInfo WHERE id = ?";
+                    String loginQuery = "SELECT * FROM personInfo WHERE id = ?";
 
                     try (PreparedStatement loginStmt = con.prepareStatement(loginQuery)) {
                         loginStmt.setLong(1, otherUserId);
@@ -73,8 +73,9 @@ public class LoggedInController {
                                 String otherLogin = loginRs.getString("login");
                                 String firstName = loginRs.getString("name");
                                 String lastName = loginRs.getString("last_name");
-
-                                Chat chat = new Chat(chatId, otherLogin, firstName, lastName);
+                                String other_password = loginRs.getString("password");
+                                User otherUser= new User(otherUserId, firstName, lastName, other_password, otherLogin);
+                                Chat chat = new Chat(chatId, otherUser);
                                 chatList.add(chat);
                             }
                         }
@@ -82,7 +83,6 @@ public class LoggedInController {
                 }
             }
         }
-
         chatListView.setItems(chatList); // Update the ListView items
     }
 
@@ -121,6 +121,8 @@ public class LoggedInController {
                     long otherUserId = rs.getLong("id");
                     String firstName = rs.getString("name");
                     String lastName = rs.getString("last_name");
+                    String password = rs.getString("password");
+                    User new_chatter = new User(otherUserId, firstName, lastName, password, otherLogin);
                     System.out.println("User found: " + otherUserId);
 
                     try (PreparedStatement insertPst = con.prepareStatement(insertSQL)) {
@@ -132,7 +134,7 @@ public class LoggedInController {
                     }
 
                     // Note: chatId may not be the same as personInfo.id; consider querying the chat ID again if needed
-                    Chat newChat = new Chat(rs.getInt("id"), otherLogin, firstName, lastName);
+                    Chat newChat = new Chat(rs.getInt("id"), new_chatter);
                     chatList.add(newChat);
 
                 } else {
@@ -177,7 +179,7 @@ public class LoggedInController {
         Chat selectedUser = chatListView.getSelectionModel().getSelectedItem();
 
         // Ignore invalid selections or selecting self
-        if (selectedUser == null || selectedUser.getLogin() == null || selectedUser.getLogin().equals(currentUser.getLogin())) {
+        if (selectedUser == null || selectedUser.getOtherUser().getLogin() == null || selectedUser.getOtherUser().getLogin().equals(currentUser.getLogin())) {
             return;
         }
 
@@ -186,11 +188,11 @@ public class LoggedInController {
             Parent chatContent = loader.load();
             chatContent.getStylesheets().clear();
             ChatController chatController = loader.getController();
-            Client client = new Client(currentUser.getLogin(), selectedUser.getLogin());
+            Client client = new Client(currentUser, selectedUser.getOtherUser());
             chatController.setClient(client);
-            System.out.println(currentUser.getLogin()+" "+selectedUser.getLogin() );
-            chatController.initData(currentUser.getLogin(), selectedUser.getLogin());
-
+            System.out.println(currentUser.getLogin()+" "+selectedUser.getOtherUser().getLogin() );
+            chatController.initData(currentUser, selectedUser.getOtherUser());
+            chatController.setChat(selectedUser);
             // Replace current chat holder content with loaded chat UI
             chat_holder.getChildren().setAll(chatContent);
 

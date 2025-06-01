@@ -19,7 +19,7 @@
 
       <ListView fx:id="messageListView" styleClass="chat-messages" AnchorPane.bottomAnchor="58.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="60.0" />
 
-      <TextField fx:id="messageInput" prefHeight="44.0" promptText="Type your message..." styleClass="chat-input" AnchorPane.bottomAnchor="9.0" AnchorPane.leftAnchor="6.0" AnchorPane.rightAnchor="55.0" />
+      <TextField fx:id="messageInput" onAction="#sendFromEnter" prefHeight="44.0" promptText="Type your message..." styleClass="chat-input" AnchorPane.bottomAnchor="9.0" AnchorPane.leftAnchor="6.0" AnchorPane.rightAnchor="55.0" />
 
 
       <ImageView fx:id="send" accessibleRole="BUTTON" fitHeight="44.0" fitWidth="39.0" onMouseClicked="#send" pickOnBounds="true" preserveRatio="true" AnchorPane.bottomAnchor="9.0" AnchorPane.rightAnchor="6.0">

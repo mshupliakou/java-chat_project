@@ -8,11 +8,14 @@ import java.net.*;
  * Sends login info on connection and listens for incoming messages asynchronously.
  */
 public class Client {
-    private static final String SERVER_ADDRESS = "localhost";
+
+    //private static final String SERVER_ADDRESS = "localhost";
+    private static final String SERVER_ADDRESS = "192.168.246.220";
+
     private static final int SERVER_PORT = 12345;
 
-    private final String login;
-    private final String login2;
+    private final User me;
+    private final User other;
 
     private Socket socket;
     private PrintWriter out;
@@ -20,9 +23,10 @@ public class Client {
 
     private MessageListener messageListener;
 
-    public Client(String login, String login2) {
-        this.login = login;
-        this.login2 = login2;
+    public Client(User me, User other) {
+        this.me = me;
+        this.other = other;
+
     }
 
     /**
@@ -48,7 +52,7 @@ public class Client {
             in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
 
             // Send login information to server
-            out.println("LOGIN:" + login + ":" + login2);
+            out.println("LOGIN:" + me.getLogin() + ":" + other.getLogin());
 
             // Start a separate thread to continuously listen for server messages
             new Thread(() -> {
@@ -107,13 +111,14 @@ public class Client {
         }
     }
 
-    public String getLogin() {
-        return login;
+    public String getMyLogin() {
+        return me.getLogin();
     }
 
-    public String getLogin2() {
-        return login2;
+    public String getOtherLogin() {
+        return other.getLogin();
     }
+
 
     /**
      * Listener interface for receiving messages from the server.

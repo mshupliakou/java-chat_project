@@ -2,29 +2,28 @@ package com.example.javachat_project;
 
 import java.io.*;
 import java.net.*;
-import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.*;
+import java.util.concurrent.*;
 
 /**
- * A simple multi-client chat server that supports private messaging.
+ * A multi-client chat server supporting private two-way conversations.
  */
 public class Server {
     private static final int PORT = 12345;
-    private static final CopyOnWriteArrayList<ClientHandler> clients = new CopyOnWriteArrayList<>();
+
+    // Maps chat key (e.g., "alice:bob") to a list of ClientHandlers in that chat
+    private static final Map<String, List<ClientHandler>> activeChats = new ConcurrentHashMap<>();
 
     public static void main(String[] args) {
         try (ServerSocket serverSocket = new ServerSocket(PORT)) {
             System.out.println("Server is running and waiting for connections...");
 
             while (true) {
-
                 Socket clientSocket = serverSocket.accept();
                 System.out.println("New client connected: " + clientSocket);
 
                 ClientHandler clientHandler = new ClientHandler(clientSocket);
-                clients.add(clientHandler);
                 new Thread(clientHandler).start();
-
-
             }
 
         } catch (IOException e) {
@@ -34,14 +33,10 @@ public class Server {
     }
 
     /**
-     * Broadcast a message to all clients except the sender.
+     * Creates a chat key that uniquely identifies a chat between two users, regardless of order.
      */
-    public static void broadcast(String message, ClientHandler sender) {
-        for (ClientHandler client : clients) {
-            if (client != sender) {
-                client.sendMessage(message);
-            }
-        }
+    private static String getChatKey(String user1, String user2) {
+        return user1.compareTo(user2) < 0 ? user1 + ":" + user2 : user2 + ":" + user1;
     }
 
     private static class ClientHandler implements Runnable {
@@ -50,6 +45,7 @@ public class Server {
         private BufferedReader in;
         private String username;
         private String targetUsername;
+        private String chatKey;
 
         public ClientHandler(Socket socket) {
             this.clientSocket = socket;
@@ -58,11 +54,10 @@ public class Server {
         @Override
         public void run() {
             try {
-                // Initialize streams inside the try block to ensure they're closed properly
                 out = new PrintWriter(clientSocket.getOutputStream(), true);
                 in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
 
-                // Expect LOGIN command in format: LOGIN:sender:receiver
+                // Expect LOGIN:sender:receiver
                 String loginCommand = in.readLine();
                 if (loginCommand == null || !loginCommand.startsWith("LOGIN:")) {
                     out.println("[Server]: LOGIN command expected.");
@@ -71,21 +66,24 @@ public class Server {
 
                 String[] parts = loginCommand.split(":");
                 if (parts.length != 3) {
-                    out.println("[Server]: Invalid LOGIN command format.");
+                    out.println("[Server]: Invalid LOGIN format.");
                     return;
                 }
 
                 username = parts[1].trim();
                 targetUsername = parts[2].trim();
+                chatKey = getChatKey(username, targetUsername);
 
-               // System.out.println("User " + username + " connected to chat with " + targetUsername);
-                //out.println("[Server]: Connected as " + username + ", chatting with " + targetUsername);
+                // Register this client into the chat
+                activeChats.computeIfAbsent(chatKey, k -> new CopyOnWriteArrayList<>()).add(this);
 
-                // Listen for messages from this client and forward them privately
+                out.println("[Server]: Connected as " + username + ". Chatting with " + targetUsername + ".");
+
+                // Read messages and forward to other participant(s)
                 String inputLine;
                 while ((inputLine = in.readLine()) != null) {
                     System.out.println("[" + username + " -> " + targetUsername + "]: " + inputLine);
-                    sendPrivate(  inputLine, targetUsername);
+                    sendPrivate(inputLine);
                 }
 
             } catch (IOException e) {
@@ -106,29 +104,39 @@ public class Server {
         }
 
         /**
-         * Sends a private message to the recipient client.
-         * If recipient not found, notifies sender.
+         * Sends the message to other users in the same chat.
          */
-        public void sendPrivate(String message, String recipient) {
-            boolean delivered = false;
-            for (ClientHandler client : clients) {
-                if (client.username != null && client.username.equals(recipient)) {
-                    client.sendMessage(message);
-                    delivered = true;
-                    break;
+        public void sendPrivate(String message) {
+            List<ClientHandler> chatHandlers = activeChats.get(chatKey);
+
+            if (chatHandlers != null) {
+                for (ClientHandler client : chatHandlers) {
+                    if (client != this) {
+                        client.sendMessage(username + ":" + message);
+
+                    }
                 }
-            }
-            if (!delivered) {
-                //sendMessage("[Server]: User " + recipient + " not found or offline.");
+            } else {
+                sendMessage("[Server]: Chat not found.");
             }
         }
 
         /**
-         * Clean up resources and remove this client from the list.
+         * Removes the user from the active chat and cleans up resources.
          */
         private void cleanup() {
-            clients.remove(this);
+            if (chatKey != null) {
+                List<ClientHandler> handlers = activeChats.get(chatKey);
+                if (handlers != null) {
+                    handlers.remove(this);
+                    if (handlers.isEmpty()) {
+                        activeChats.remove(chatKey);
+                    }
+                }
+            }
+
             System.out.println("User " + username + " disconnected.");
+
             try {
                 if (in != null) in.close();
                 if (out != null) out.close();

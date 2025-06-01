@@ -4,6 +4,7 @@ import com.example.javachat_project.DB.SupabaseConnect;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.geometry.Insets;
 import javafx.scene.control.*;
@@ -16,79 +17,37 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.time.OffsetDateTime;
 
 public class ChatController {
-
     @FXML
     private TextField messageInput;
-
     @FXML
     private  Label chat_name;
-    @FXML
-    private VBox vbox;
-
     @FXML
     private ListView<Message> messageListView;
 
     private Client client;
+    private Connection connection;
+    private Chat chat;
+
+
     private final ObservableList<Message> messageList = FXCollections.observableArrayList();
 
     public void setClient(Client client) {
         this.client = client;
     }
+
+
     /**
      * Initializes chat data by retrieving user IDs for both the current user and the target user.
      * Starts the client to begin chat communication.
      *
-     * @param myLogin     The login of the current user.
-     * @param targetLogin The login of the user to chat with.
      */
-    public void initData(String myLogin, String targetLogin) {
-        chat_name.setText(targetLogin);
-        int id1 = -1;
-        int id2 = -1;
-
-        String query = "SELECT id, login FROM personInfo WHERE login = ? OR login = ?";
-        Connection conn = SupabaseConnect.getConnection();
-
-        try {
-            System.out.println("Is connection closed? " + conn.isClosed());
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        }
-
-        try (PreparedStatement stmt = conn.prepareStatement(query)) {
-            stmt.setString(1, myLogin);
-            stmt.setString(2, targetLogin);
-
-            try (ResultSet rs = stmt.executeQuery()) {
-                while (rs.next()) {
-                    String login = rs.getString("login");
-                    long id = rs.getLong("id");
-
-                    if (login.equals(myLogin)) {
-                        id1 = (int) id;
-                    } else if (login.equals(targetLogin)) {
-                        id2 = (int) id;
-                    }
-                }
-            }
-        } catch (SQLException e) {
-            System.err.println("Database error while fetching user IDs:");
-            e.printStackTrace();
-            return;
-        }
-
-        if (id1 == -1 || id2 == -1) {
-            System.err.println("Failed to find one or both users in database.");
-            return;
-        }
-
-
+    public void initData(User me, User target) {
+        chat_name.setText(target.getName()+" "+target.getLastName());
+        connection=SupabaseConnect.getConnection();
         messageListView.setItems(messageList);
-
-
-
         messageListView.setCellFactory(listView -> new ListCell<>() {
             @Override
             protected void updateItem(Message message, boolean empty) {
@@ -129,22 +88,60 @@ public class ChatController {
             }
         });
 
-
-
         client.setMessageListener(message -> {
-            Platform.runLater(() -> messageList.add(new Message(message, false)));
+            System.out.println(message);
+            String[] parts = message.split(":", 3);
+            if (parts.length < 3) return;
+
+            String sender = parts[0];
+            String text = parts[2];
+            System.out.println("Got a message "+text);
+
+
+            if (sender.equals(target.getLogin()) || sender.equals(client.getMyLogin())) {
+
+                Platform.runLater(() -> messageList.add(new Message(text, sender.equals(client.getMyLogin()), sender)));
+                try (PreparedStatement stmt = connection.prepareStatement(
+                        "INSERT INTO message (id_author, text, id_chat, time_of_sending) VALUES (?, ?, ?, ?)")) {
+                    if(sender.equals(client.getMyLogin()))
+                    stmt.setLong(1, me.getId());
+                    else{
+                        stmt.setLong(1, target.getId());
+                    }
+                    stmt.setString(2, text);
+                    stmt.setLong(3, chat.getChatId());
+                    stmt.setObject(4, OffsetDateTime.now());
+                    stmt.executeUpdate();
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
+
+            }
         });
-
-
         new Thread(client::begin).start();
     }
 
     public void send(MouseEvent mouseEvent) {
+        sending();
+    }
+
+
+    public void sending(){
         String msg = messageInput.getText();
         if (msg == null || msg.isBlank()) return;
 
-        client.sendMessage(msg);
-        messageList.add(new Message(msg, true));
+        String messageToSend = client.getMyLogin() + ":" + msg;
+        client.sendMessage(messageToSend);
+
+        messageList.add(new Message(msg, true, client.getMyLogin()));
         messageInput.clear();
+    }
+
+    public void setChat(Chat chat) {
+        this.chat = chat;
+    }
+
+    public void sendFromEnter(ActionEvent actionEvent) {
+        sending();
     }
 }
