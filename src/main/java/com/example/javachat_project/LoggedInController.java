@@ -1,29 +1,20 @@
 package com.example.javachat_project;
-
 import com.example.javachat_project.DB.SupabaseConnect;
-import javafx.animation.KeyFrame;
-import javafx.animation.Timeline;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
-import javafx.scene.Scene;
 import javafx.scene.control.ListView;
 import javafx.scene.control.TextField;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
-import javafx.stage.Stage;
-import javafx.util.Duration;
-
 import java.io.IOException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-
 import static java.lang.Math.max;
 import static java.lang.Math.min;
 
@@ -35,27 +26,17 @@ public class LoggedInController {
 
     private ObservableList<Chat> chatList; // Observable list backing the ListView
     private Connection con; // Database connection object
-    private long currentUserId; // The logged-in user's ID
-    private String currentUserLogin; // The logged-in user's login (should be set somewhere)
+    private User currentUser;
 
-    /**
-     * Sets the current user ID and loads chats for this user.
-     * @param id logged-in user's ID
-     */
-    public void setCurrentUserId(long id) {
-        this.currentUserId = id;
+
+    public void setCurrentUser(User currentUser) {
+        this.currentUser = currentUser;
         try {
             loadChats();
         } catch (SQLException e) {
-            throw new RuntimeException("Error loading chats for user: " + id, e);
+            throw new RuntimeException("Error loading chats for user: " + currentUser, e);
         }
     }
-
-    public void setCurrentUserLogin(String login) {
-        this.currentUserLogin = login;
-
-    }
-
 
     /**
      * Loads all chats for the current user from the database.
@@ -73,9 +54,9 @@ public class LoggedInController {
 
         try (PreparedStatement stmt = con.prepareStatement(sql)) {
             // Set parameters for currentUserId in all three places
-            stmt.setLong(1, currentUserId);
-            stmt.setLong(2, currentUserId);
-            stmt.setLong(3, currentUserId);
+            stmt.setLong(1, currentUser.getId());
+            stmt.setLong(2, currentUser.getId());
+            stmt.setLong(3, currentUser.getId());
 
             try (ResultSet rs = stmt.executeQuery()) {
                 while (rs.next()) {
@@ -120,17 +101,15 @@ public class LoggedInController {
      * @throws SQLException if DB error occurs
      */
     private void refreshChats() throws SQLException {
-        if (currentUserId == 0) return;
+        if (currentUser.getId() == 0) return;
         chatList.clear();
         loadChats();
     }
 
     /**
      * Creates a new chat connection with another user identified by their login.
-     * @param otherLogin login of the other user
-     * @param currentUserId logged-in user's ID
      */
-    public void newChat(String otherLogin, long currentUserId) {
+    public void newChat(String otherLogin) {
         String getIdQuery = "SELECT id, name, last_name FROM personInfo WHERE login = ?";
         String insertSQL = "INSERT INTO chats_connections(id_1, id_2) VALUES (?, ?)";
 
@@ -146,8 +125,8 @@ public class LoggedInController {
 
                     try (PreparedStatement insertPst = con.prepareStatement(insertSQL)) {
                         // Always store smaller ID first to avoid duplicates (convention)
-                        insertPst.setLong(1, min(currentUserId, otherUserId));
-                        insertPst.setLong(2, max(currentUserId, otherUserId));
+                        insertPst.setLong(1, min(currentUser.getId(), otherUserId));
+                        insertPst.setLong(2, max(currentUser.getId(), otherUserId));
                         insertPst.executeUpdate();
                         System.out.println("Chat connection created.");
                     }
@@ -179,7 +158,7 @@ public class LoggedInController {
             try (ResultSet rs = pst.executeQuery()) {
                 if (rs.next()) {
                     System.out.println("User found!");
-                    newChat(login, currentUserId);
+                    newChat(login);
                 } else {
                     System.out.println("There is no such login!");
                 }
@@ -198,39 +177,19 @@ public class LoggedInController {
         Chat selectedUser = chatListView.getSelectionModel().getSelectedItem();
 
         // Ignore invalid selections or selecting self
-        if (selectedUser == null || selectedUser.getLogin() == null || selectedUser.getLogin().equals(currentUserLogin)) {
+        if (selectedUser == null || selectedUser.getLogin() == null || selectedUser.getLogin().equals(currentUser.getLogin())) {
             return;
         }
 
         try {
-
-
-
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/chat.fxml"));
             Parent chatContent = loader.load();
             chatContent.getStylesheets().clear();
-
-
             ChatController chatController = loader.getController();
-
-            // Pass the current and selected user logins to the chat controller
-
-            String loginQuery = "SELECT login FROM personInfo WHERE id = ?";
-
-            try (PreparedStatement loginStmt = con.prepareStatement(loginQuery)) {
-                loginStmt.setLong(1, currentUserId);
-                try (ResultSet loginRs = loginStmt.executeQuery()) {
-                    if (loginRs.next()) {
-                        currentUserLogin= loginRs.getString("login");
-                    }
-                }
-            } catch (SQLException e) {
-                throw new RuntimeException(e);
-            }
-            Client client = new Client(currentUserLogin, selectedUser.getLogin());
+            Client client = new Client(currentUser.getLogin(), selectedUser.getLogin());
             chatController.setClient(client);
-            System.out.println(currentUserLogin+" "+selectedUser.getLogin() );
-            chatController.initData(currentUserLogin, selectedUser.getLogin());
+            System.out.println(currentUser.getLogin()+" "+selectedUser.getLogin() );
+            chatController.initData(currentUser.getLogin(), selectedUser.getLogin());
 
             // Replace current chat holder content with loaded chat UI
             chat_holder.getChildren().setAll(chatContent);

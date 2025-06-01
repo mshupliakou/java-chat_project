@@ -38,7 +38,7 @@
             <Button fx:id="btnLogin" cache="true" cacheHint="QUALITY" layoutX="92.0" layoutY="361.0" mnemonicParsing="false" onMouseClicked="#logIn" prefHeight="38.0" prefWidth="250.0" style="-fx-border-radius: 20; -fx-background-radius: 20; -fx-font-size: 15; -fx-font-family: Arial;" stylesheets="@../css/login.css" text="Log In" textFill="WHITE" />
             <Button fx:id="btnSignUp" cache="true" cacheHint="QUALITY" layoutX="92.0" layoutY="437.0" mnemonicParsing="false" onMouseClicked="#signUp" prefHeight="38.0" prefWidth="250.0" stylesheets="@../css/login.css" text="Sign Up" textFill="WHITE" />
             <Label id="label_advice" cache="true" cacheHint="QUALITY" layoutX="102.0" layoutY="421.0" opacity="0.65" stylesheets="@../../../../../../../gitHub/java/my_final_project/src/main/resources/com/example/my_final_project/logining.css" text="You are not signed up? Create an account!" />
-            <PasswordField fx:id="tfPassword" cacheHint="QUALITY" layoutX="92.0" layoutY="277.0" prefHeight="40.0" prefWidth="250.0" promptText="Password" />
+            <PasswordField fx:id="tfPassword" cacheHint="QUALITY" layoutX="92.0" layoutY="277.0" onAction="#logInFromEnter" prefHeight="40.0" prefWidth="250.0" promptText="Password" />
             <Label id="loginWrg" fx:id="loginWrg" layoutX="102.0" layoutY="399.0" prefHeight="22.0" prefWidth="230.0" stylesheets="@../css/login.css" />
          </children>
       </AnchorPane>

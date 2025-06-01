@@ -1,6 +1,7 @@
 package com.example.javachat_project;
 
 import com.example.javachat_project.DB.SupabaseConnect;
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
@@ -20,10 +21,15 @@ import java.sql.SQLException;
 import java.util.Objects;
 
 public class MainController {
-    @FXML private TextField tfPassword;
-    @FXML private TextField tfLogin;
-    @FXML private Label loginWrg;
-    private long myId;
+
+    @FXML private TextField tfPassword; // Password input field
+    @FXML private TextField tfLogin;    // Login input field
+    @FXML private Label loginWrg;       // Label to show login errors
+
+    private User me;                    // Stores the current user upon successful login
+    private Connection remoteConnection; // Database connection
+
+    // Handles "Sign Up" link/button click and opens the sign-up window
     public void signUp(MouseEvent mouseEvent) {
         Parent root = null;
         try {
@@ -31,28 +37,39 @@ public class MainController {
         } catch (IOException e) {
             e.printStackTrace();
         }
+
         Stage primstage = new Stage();
         primstage.getIcons().add(new javafx.scene.image.Image(
                 Objects.requireNonNull(MainLogin.class.getResourceAsStream("/img/mini_logo.png"))
         ));
         primstage.setTitle("Echo | Sign Up");
+
         assert root != null;
         Scene scene = new Scene(root);
         primstage.setScene(scene);
         primstage.setHeight(630);
         primstage.setWidth(410);
         primstage.setResizable(false);
-        primstage.initModality(Modality.APPLICATION_MODAL);
+        primstage.initModality(Modality.APPLICATION_MODAL); // Modal window
         primstage.show();
     }
-    private Connection remoteConnection;
+
+    // Initializes the controller (called automatically after FXML is loaded)
     public void initialize() {
-        remoteConnection = SupabaseConnect.getConnection();
+        remoteConnection = SupabaseConnect.getConnection(); // Establish database connection
+
+        // When ENTER is pressed in the login field, focus moves to the password field
+        tfLogin.setOnAction(event -> {
+            tfPassword.requestFocus();
+        });
     }
+
+    // Verifies login and password against the database
     public boolean verify_logging_data() {
         String login = tfLogin.getText();
         String password = tfPassword.getText();
 
+        // Show message if login or password field is empty
         if (login.isEmpty() || password.isEmpty()) {
             loginWrg.setText("Please enter login and password!");
             return false;
@@ -66,7 +83,11 @@ public class MainController {
 
             try (ResultSet rs = pst.executeQuery()) {
                 if (rs.next()) {
-                    myId = rs.getLong("id");
+                    // Create user if credentials match
+                    long myId = rs.getLong("id");
+                    String myName = rs.getString("name");
+                    String myLastName = rs.getString("last_name");
+                    me = new User(myId, myName, myLastName, password, login);
                     return true;
                 } else {
                     loginWrg.setText("Incorrect login or password!");
@@ -80,26 +101,45 @@ public class MainController {
         }
     }
 
-    public void logIn(MouseEvent mouseEvent) {
-        if(verify_logging_data())
+    // General login method for both mouse and keyboard events
+    public void logIn(Object eventSource) {
+        if (!verify_logging_data()) return;
+
         try {
+            // Load the "logged in" scene
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/logged_in.fxml"));
             Parent root = loader.load();
 
             LoggedInController loggedInController = loader.getController();
+            loggedInController.setCurrentUser(me);
 
-            loggedInController.setCurrentUserId(myId);
-            Stage stage = (Stage) ((Node) mouseEvent.getSource()).getScene().getWindow();
+            Stage stage;
+            // Determine the type of event source and retrieve the current stage
+            if (eventSource instanceof MouseEvent) {
+                stage = (Stage) ((Node) ((MouseEvent) eventSource).getSource()).getScene().getWindow();
+            } else if (eventSource instanceof ActionEvent) {
+                stage = (Stage) ((Node) ((ActionEvent) eventSource).getSource()).getScene().getWindow();
+            } else {
+                return; // Unsupported event type
+            }
 
-            Scene scene = new Scene(root);
-
-            stage.setScene(scene);
+            // Switch to the new scene
+            stage.setScene(new Scene(root));
             stage.setTitle("Echo");
-
             stage.show();
 
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    // Called when login button is clicked with mouse
+    public void logIn(MouseEvent mouseEvent) {
+        logIn((Object) mouseEvent);
+    }
+
+    // Called when ENTER is pressed in the password field
+    public void logInFromEnter(ActionEvent actionEvent) {
+        logIn((Object) actionEvent);
     }
 }
