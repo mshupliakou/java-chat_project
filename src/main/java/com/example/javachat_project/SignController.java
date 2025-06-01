@@ -6,7 +6,6 @@ import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 import javafx.scene.input.MouseEvent;
-import com.example.javachat_project.DB.DBConnection;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;

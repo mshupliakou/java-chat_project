@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ListView?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.Pane?>
+
+<AnchorPane id="anchor" prefHeight="600.0" prefWidth="490.0" stylesheets="@../css/chat.css" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.javachat_project.ChatController">
+
+   <children>
+
+      <ListView id="messages" fx:id="messageListView" layoutY="43.2" prefHeight="499.0" prefWidth="490.0" styleClass="chat-messages" stylesheets="@../css/chat.css" AnchorPane.bottomAnchor="58.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="60.0" />
+
+      <TextField fx:id="messageInput" layoutX="6.4" prefHeight="44.0" prefWidth="429.0" promptText="Type your message..." stylesheets="@../css/chat.css" AnchorPane.bottomAnchor="9.0" AnchorPane.leftAnchor="6.0" AnchorPane.rightAnchor="55.0" />
+      <ImageView fx:id="send" accessibleRole="BUTTON" cache="true" cacheHint="QUALITY" fitHeight="44.0" fitWidth="39.0" layoutX="444.0" layoutY="550.0" onMouseClicked="#send" pickOnBounds="true" preserveRatio="true">
+         <image>
+            <Image url="@../img/sending.png" />
+         </image>
+      </ImageView>
+      <Pane id="chat_name_pane" prefHeight="60.0" prefWidth="490.0">
+         <children>
+            <Label id="chat_name_label" fx:id="chat_name" layoutY="-1.0" prefHeight="18.0" prefWidth="449.0" stylesheets="@../css/chat.css" text="Chat">
+               <padding>
+                  <Insets left="24.0" top="14.0" />
+               </padding>
+            </Label>
+         </children>
+      </Pane>
+   </children>
+
+</AnchorPane>

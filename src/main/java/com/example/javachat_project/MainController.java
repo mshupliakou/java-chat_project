@@ -1,6 +1,5 @@
 package com.example.javachat_project;
 
-import com.example.javachat_project.DB.DBConnection;
 import com.example.javachat_project.DB.SupabaseConnect;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -103,6 +102,4 @@ public class MainController {
             e.printStackTrace();
         }
     }
-
-
 }
