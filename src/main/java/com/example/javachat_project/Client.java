@@ -9,9 +9,8 @@ import java.net.*;
  */
 public class Client {
 
-    //private static final String SERVER_ADDRESS = "localhost";
-    private static final String SERVER_ADDRESS = "192.168.246.220";
-
+    private static final String SERVER_ADDRESS = "localhost";
+    
     private static final int SERVER_PORT = 12345;
 
     private final User me;
