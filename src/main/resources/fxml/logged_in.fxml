@@ -4,6 +4,8 @@
 <?import javafx.scene.control.ListView?>
 <?import javafx.scene.control.SplitPane?>
 <?import javafx.scene.control.TextField?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.StackPane?>
 
@@ -13,9 +15,14 @@
             <items>
                 <AnchorPane maxWidth="410.0" minWidth="120.0" prefWidth="410.0" stylesheets="@../css/loggen_in.css">
                     <children>
-                        <TextField fx:id="search" layoutX="14.0" layoutY="14.0" onAction="#handleEnter" prefHeight="30.0" promptText="Search" AnchorPane.leftAnchor="14.0" AnchorPane.rightAnchor="14.799999999999955" AnchorPane.topAnchor="14.0" />
+                        <TextField fx:id="search" layoutX="10.4" layoutY="15.2" onAction="#handleEnter" prefHeight="34.0" prefWidth="342.0" promptText="Search" AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="52.0" AnchorPane.topAnchor="15.0" />
 
                         <ListView fx:id="chatListView" onMouseClicked="#chooseChat" stylesheets="@../css/loggen_in.css" AnchorPane.bottomAnchor="0" AnchorPane.leftAnchor="0" AnchorPane.rightAnchor="0" AnchorPane.topAnchor="60" />
+                  <ImageView fx:id="refresh" fitHeight="34.0" fitWidth="34.0" layoutX="356.0" layoutY="15.0" onMouseClicked="#refreshChats" pickOnBounds="true" preserveRatio="true">
+                     <image>
+                        <Image url="@../img/refresh.png" />
+                     </image>
+                  </ImageView>
                     </children>
                 </AnchorPane>
 

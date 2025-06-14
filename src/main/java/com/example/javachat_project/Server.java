@@ -112,7 +112,7 @@ public class Server {
             if (chatHandlers != null) {
                 for (ClientHandler client : chatHandlers) {
                     if (client != this) {
-                        client.sendMessage(username + ":" + message);
+                        client.sendMessage(username + ";" + message);
 
                     }
                 }
@@ -146,5 +146,11 @@ public class Server {
                 e.printStackTrace();
             }
         }
+
+
+
+
     }
+
+
 }

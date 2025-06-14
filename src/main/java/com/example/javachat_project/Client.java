@@ -10,7 +10,7 @@ import java.net.*;
 public class Client {
 
     private static final String SERVER_ADDRESS = "localhost";
-    
+
     private static final int SERVER_PORT = 12345;
 
     private final User me;
@@ -32,6 +32,7 @@ public class Client {
      * Sets a listener to handle incoming messages from the server.
      */
     public void setMessageListener(MessageListener listener) {
+
         this.messageListener = listener;
     }
 

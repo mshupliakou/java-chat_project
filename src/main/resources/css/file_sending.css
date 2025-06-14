@@ -1,0 +1,46 @@
+.button {
+    -fx-border-radius: 20;
+    -fx-background-radius: 20;
+    -fx-background-color: #1c4526;
+    -fx-font-size: 15;
+    -fx-font-family: Arial;
+    -fx-text-fill: white;
+
+
+    -fx-transition: all 0.3s ease;
+    -fx-effect: dropshadow(gaussian, transparent, 0, 0, 0, 0);
+    -fx-cursor: hand;
+}
+
+.text-field {
+    -fx-font-family: "Inter", Arial, sans-serif;
+    -fx-font-size: 15;
+    -fx-padding: 6;
+    -fx-border-radius: 5;
+    -fx-background-radius: 5;
+    -fx-background-color: white;
+    -fx-border-color: #ccc;
+    -fx-effect: null;
+}
+
+.label{
+    -fx-font-family: "Inter", Arial, sans-serif;
+    -fx-font-size: 20px;
+    -fx-text-fill: #2c3e50;
+}
+
+.text-field:focused {
+    -fx-effect: dropshadow(gaussian, #38a169, 12, 0.3, 0, 0);
+    -fx-border-color: #38a169;
+}
+
+.image-view {
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.2), 12, 0.3, 0, 4);
+    -fx-background-radius: 10;
+    -fx-border-radius: 10;
+    -fx-border-color: #ccc;
+    -fx-border-width: 2;
+    -fx-padding: 5;
+    -fx-smooth: true;
+    -fx-opacity: 1;
+}

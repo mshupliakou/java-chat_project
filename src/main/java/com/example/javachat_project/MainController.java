@@ -27,6 +27,12 @@ public class MainController {
     @FXML private Label loginWrg;       // Label to show login errors
 
     private User me;                    // Stores the current user upon successful login
+
+    public static LoggedInController getLoggedInController() {
+        return loggedInController;
+    }
+
+    private static LoggedInController loggedInController;
     private Connection remoteConnection; // Database connection
 
     // Handles "Sign Up" link/button click and opens the sign-up window
@@ -110,7 +116,7 @@ public class MainController {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/logged_in.fxml"));
             Parent root = loader.load();
 
-            LoggedInController loggedInController = loader.getController();
+            loggedInController = loader.getController();
             loggedInController.setCurrentUser(me);
 
             Stage stage;
