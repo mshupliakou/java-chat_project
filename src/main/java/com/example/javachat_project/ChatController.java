@@ -29,11 +29,8 @@ import javafx.scene.paint.Color;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 
-import javax.swing.*;
-import javax.swing.filechooser.FileNameExtensionFilter;
 import java.awt.*;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -41,10 +38,10 @@ import java.nio.file.Path;
 import java.sql.*;
 import java.time.OffsetDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.Arrays;
 import java.util.Base64;
 import java.util.Objects;
-import java.util.Optional;
+
+import static com.example.javachat_project.FileSendingController.readableFileSize;
 
 /**
  * Controller class for handling chat logic and GUI.
@@ -112,6 +109,10 @@ public class ChatController {
         loadMessagesFromDatabase(me, target);
         startClientMessageListener(target);
     }
+    private boolean isImageFile(File file) {
+        String name = file.getName().toLowerCase();
+        return name.endsWith(".png") || name.endsWith(".jpg") || name.endsWith(".jpeg") || name.endsWith(".gif");
+    }
 
     /**
      * Sets up the rendering of each message in the ListView with styles and context menu.
@@ -137,33 +138,65 @@ public class ChatController {
 
 
                 File file = message.getF();
-                System.out.println("File: " + file + ", exists: " + (file != null && file.exists()));
 
                 if (file != null && file.exists()) {
-                    Image image = new Image(file.toURI().toString());
-                    ImageView imageView = new ImageView(image);
+                    if (isImageFile(file)||message.isImage()) {
+                        Image image = new Image(file.toURI().toString());
+                        ImageView imageView = new ImageView(image);
 
-                    imageView.setPreserveRatio(true);
-                    imageView.setFitWidth(300);
+                        imageView.setPreserveRatio(true);
+                        imageView.setFitWidth(300);
 
-                    bubble.getChildren().add(imageView);
+                        bubble.getChildren().add(imageView);
 
-                    imageView.setOnMouseClicked(event -> {
-                        Stage stage = new Stage();
-                        ImageView bigImageView = new ImageView(image);
-                        bigImageView.setPreserveRatio(true);
-                        bigImageView.setFitWidth(800);
+                        imageView.setOnMouseClicked(event -> {
+                            Stage stage = new Stage();
+                            ImageView bigImageView = new ImageView(image);
+                            bigImageView.setPreserveRatio(true);
+                            bigImageView.setFitWidth(800);
 
-                        StackPane root = new StackPane(bigImageView);
-                        root.setStyle("-fx-background-color: rgba(0, 0, 0, 0.8);");
+                            StackPane root = new StackPane(bigImageView);
+                            root.setStyle("-fx-background-color: rgba(0, 0, 0, 0.8);");
 
-                        Scene scene = new Scene(root);
-                        stage.setScene(scene);
-                        stage.initModality(Modality.APPLICATION_MODAL);
-                        stage.setTitle("Image Preview");
-                        stage.show();
-                    });
+                            Scene scene = new Scene(root);
+                            stage.setScene(scene);
+                            stage.initModality(Modality.APPLICATION_MODAL);
+                            stage.setTitle("Image Preview");
+                            stage.show();
+                        });
+                    } else {
+                        HBox fileBox = new HBox(10);
+                        fileBox.setAlignment(Pos.CENTER_LEFT);
+
+                        ImageView fileIcon = new ImageView(new Image(Objects.requireNonNull(getClass().getResourceAsStream("/img/blank-page.png"))));
+                        fileIcon.setFitWidth(24);
+                        fileIcon.setFitHeight(24);
+
+                        VBox fileInfo = new VBox(2);
+                        Label fileNameLabel = new Label(file.getName());
+                        Label fileSizeLabel = new Label(readableFileSize(file.length()));
+                        fileSizeLabel.setStyle("-fx-font-size: 10px; -fx-text-fill: #666666;");
+
+                        fileInfo.getChildren().addAll(fileNameLabel, fileSizeLabel);
+                        fileBox.getChildren().addAll(fileIcon, fileInfo);
+
+
+                        fileBox.setOnMouseClicked(event -> {
+                            try {
+                                Desktop.getDesktop().open(file);
+                            } catch (IOException ex) {
+                                ex.printStackTrace();
+                            }
+                        });
+
+                        bubble.getChildren().add(fileBox);
+
+                    }
+
                 }
+
+
+
                 Label textLabel = new Label();
                 textLabel.setWrapText(true);
                 textLabel.setTextOverrun(OverrunStyle.CLIP);
@@ -250,8 +283,16 @@ public class ChatController {
      * Loads messages from the database for this chat.
      */
     private void loadMessagesFromDatabase(User me, User target) {
-        try (PreparedStatement stmt = connection.prepareStatement(
-                "SELECT id_message, id_author, time_of_sending, text, attachment_data FROM message WHERE id_chat = ? ORDER BY time_of_sending")) {
+        String query = """
+        SELECT m.id_message, m.id_author, m.time_of_sending, m.text,
+               a.file_name, a.extension, a.inside
+        FROM message m
+        LEFT JOIN attachments a ON m.id_attachment = a.id
+        WHERE m.id_chat = ?
+        ORDER BY m.time_of_sending
+        """;
+
+        try (PreparedStatement stmt = connection.prepareStatement(query)) {
             stmt.setLong(1, chat.getChatId());
             ResultSet rs = stmt.executeQuery();
 
@@ -261,54 +302,83 @@ public class ChatController {
                 String text = rs.getString("text");
                 OffsetDateTime time = rs.getObject("time_of_sending", OffsetDateTime.class);
                 boolean isFromMe = authorId == me.getId();
-                byte[] attachmentBytes = rs.getBytes("attachment_data");
+
                 File file = null;
-                if (attachmentBytes != null && attachmentBytes.length > 0) {
-                    file = File.createTempFile("img_" + messageID, ".png");
+                byte[] fileBytes = rs.getBytes("inside");
+                String extension = rs.getString("extension");
+
+                if (fileBytes != null && fileBytes.length > 0 && extension != null) {
+                    if (!extension.startsWith(".")) {
+                        extension = "." + extension;
+                    }
+
+                    file = File.createTempFile("img_" + messageID, extension);
                     try (FileOutputStream fos = new FileOutputStream(file)) {
-                        fos.write(attachmentBytes);
+                        fos.write(fileBytes);
                     }
                     file.deleteOnExit();
                 }
-                messageList.add(new Message(text, isFromMe, isFromMe ? me.getLogin() : target.getLogin(), time, messageID, file));
 
+                messageList.add(new Message(
+                        text,
+                        isFromMe,
+                        isFromMe ? me.getLogin() : target.getLogin(),
+                        time,
+                        messageID,
+                        file
+                ));
             }
-        } catch (SQLException e) {
+
+        } catch (SQLException | IOException e) {
             e.printStackTrace();
-        } catch (IOException e) {
-            throw new RuntimeException(e);
         }
     }
+
 
     /**
      * Starts a thread that listens for incoming messages via the Client.
      */
     private void startClientMessageListener(User target) {
         client.setMessageListener(message -> {
-            String[] parts = message.split(";", 7);
+            String[] parts = message.split(";", 8);
             if (parts.length < 5) return;
             String flag = parts[1];
             String sender;
             String text;
             OffsetDateTime time;
             String messageID;
-            if(flag.equals("NEW")){
+            if (flag.equals("NEW")) {
                 sender = parts[2];
                 text = parts[3];
                 messageID = parts[4];
                 time = OffsetDateTime.parse(parts[5]);
 
                 File tempFile = null;
+                boolean isImage = false;
+
                 if (parts.length > 6) {
                     String base64File = parts[6];
+                    String extension = parts[7].toLowerCase();
+
                     if (base64File != null && !base64File.isEmpty()) {
                         try {
                             byte[] fileBytes = Base64.getDecoder().decode(base64File);
-                            tempFile = File.createTempFile("img", ".png");
+
+                            String tempSuffix = extension;
+                            if (!tempSuffix.startsWith(".")) {
+                                tempSuffix = "." + tempSuffix;
+                            }
+
+                            tempFile = File.createTempFile("file_", tempSuffix);
                             try (FileOutputStream fos = new FileOutputStream(tempFile)) {
                                 fos.write(fileBytes);
                             }
                             tempFile.deleteOnExit();
+
+                            if (extension.equals(".png") || extension.equals(".jpg") || extension.equals(".jpeg") || extension.equals(".gif") || extension.equals(".bmp")) {
+                                isImage = true;
+                            }
+
                         } catch (IOException e) {
                             e.printStackTrace();
                             tempFile = null;
@@ -317,11 +387,15 @@ public class ChatController {
                 }
 
                 File finalTempFile = tempFile;
+                boolean finalIsImage = isImage;
+
                 Platform.runLater(() -> {
-                    System.out.println("Received file: " + finalTempFile);
-                    messageList.add(new Message(text, sender.equals(client.getMyLogin()), sender, time, Long.parseLong(messageID), finalTempFile));
+                    System.out.println("Received file: " + finalTempFile + " isImage=" + finalIsImage);
+
+                    messageList.add(new Message(text, sender.equals(client.getMyLogin()), sender, time, Long.parseLong(messageID), finalTempFile, finalIsImage));
                 });
             }
+
 
             else if (flag.equals("DELETED")) {
                 messageID = parts[3];
@@ -397,55 +471,80 @@ public class ChatController {
         OffsetDateTime t = OffsetDateTime.now();
 
         if (flag.isEmpty()) {
-            System.out.println("trying to send " + currentlySendedFile );
+            System.out.println("trying to send " + currentlySendedFile);
             byte[] fileBytes = null;
+            String extension = "";
+            String fileName = "";
+            Long attachmentId = null;
+
             if (currentlySendedFile != null) {
                 try {
                     fileBytes = Files.readAllBytes(currentlySendedFile.toPath());
+                    fileName = currentlySendedFile.getName();
+                    int dotIndex = fileName.lastIndexOf('.');
+                    extension = (dotIndex != -1) ? fileName.substring(dotIndex) : "";
                 } catch (IOException e) {
                     throw new RuntimeException(e);
                 }
             }
 
             String msg = messageInput.getText();
-            if ((msg == null || msg.isBlank() )&&currentlySendedFile==null) return;
+            if ((msg == null || msg.isBlank()) && currentlySendedFile == null) return;
 
-            try (PreparedStatement stmt = connection.prepareStatement(
-                    "INSERT INTO message (id_author, text, id_chat, time_of_sending, attachment_data) VALUES (?, ?, ?, ?, ?)",
-                    Statement.RETURN_GENERATED_KEYS)) {
+            try {
 
-                stmt.setLong(1, myself.getId());
-                stmt.setString(2, msg);
-                stmt.setLong(3, chat.getChatId());
-                stmt.setObject(4, t);
                 if (fileBytes != null) {
-                    stmt.setBytes(5, fileBytes);
-                } else {
-                    stmt.setNull(5, Types.BINARY);
+                    try (PreparedStatement attStmt = connection.prepareStatement(
+                            "INSERT INTO attachments (file_name, extension, inside) VALUES (?, ?, ?)",
+                            Statement.RETURN_GENERATED_KEYS)) {
+                        attStmt.setString(1, fileName);
+                        attStmt.setString(2, extension);
+                        attStmt.setBytes(3, fileBytes);
 
-                }
-
-                stmt.executeUpdate();
-
-                try (ResultSet generatedKeys = stmt.getGeneratedKeys()) {
-                    if (generatedKeys.next()) {
-                        long generatedId = generatedKeys.getLong(1);
-
-                        DateTimeFormatter formatter = DateTimeFormatter.ISO_OFFSET_DATE_TIME;
-                        String formattedTime = t.format(formatter);
-
-                        String base64File = (fileBytes != null) ? Base64.getEncoder().encodeToString(fileBytes) : "";
-                        messageToSend = "NEW;" + client.getMyLogin() + ";" + msg + ";" +  generatedId+ ";" + formattedTime + ";" + base64File;
-                        System.out.println(messageToSend);
-
-                        Message newMessage = new Message(msg, true, client.getMyLogin(), t, generatedId, currentlySendedFile);
-                        messageList.add(newMessage);
-
-                        client.sendMessage(messageToSend);
-                        currentlySendedFile=null;
+                        attStmt.executeUpdate();
+                        try (ResultSet keys = attStmt.getGeneratedKeys()) {
+                            if (keys.next()) {
+                                attachmentId = keys.getLong(1);
+                            }
+                        }
                     }
                 }
 
+                // Вставляем сообщение
+                try (PreparedStatement msgStmt = connection.prepareStatement(
+                        "INSERT INTO message (id_author, text, id_chat, time_of_sending, id_attachment) VALUES (?, ?, ?, ?, ?)",
+                        Statement.RETURN_GENERATED_KEYS)) {
+
+                    msgStmt.setLong(1, myself.getId());
+                    msgStmt.setString(2, msg);
+                    msgStmt.setLong(3, chat.getChatId());
+                    msgStmt.setObject(4, t);
+                    if (attachmentId != null) {
+                        msgStmt.setLong(5, attachmentId);
+                    } else {
+                        msgStmt.setNull(5, Types.BIGINT);
+                    }
+
+                    msgStmt.executeUpdate();
+
+                    try (ResultSet generatedKeys = msgStmt.getGeneratedKeys()) {
+                        if (generatedKeys.next()) {
+                            long generatedId = generatedKeys.getLong(1);
+                            String formattedTime = t.format(DateTimeFormatter.ISO_OFFSET_DATE_TIME);
+                            String base64File = (fileBytes != null) ? Base64.getEncoder().encodeToString(fileBytes) : "";
+
+
+                            messageToSend = "NEW;" + client.getMyLogin() + ";" + msg + ";" + generatedId + ";" + formattedTime + ";" + base64File + ";" + extension;
+
+                            Message newMessage = new Message(msg, true, client.getMyLogin(), t, generatedId, currentlySendedFile);
+                            messageList.add(newMessage);
+
+                            client.sendMessage(messageToSend);
+                            currentlySendedFile = null;
+                        }
+                    }
+
+                }
             } catch (SQLException e) {
                 e.printStackTrace();
             }
@@ -453,23 +552,15 @@ public class ChatController {
             messageInput.clear();
 
         } else if (flag.equals("DELETED") && message != null) {
-            System.out.println(message.getId());
             messageToSend = "DELETED;" + client.getMyLogin() + ";" + message.getId() + ";" + t;
             client.sendMessage(messageToSend);
-        }
-        else if(flag.equals("EDIT")&&message!=null){
+        } else if (flag.equals("EDIT") && message != null) {
             if (messageInput.getText() == null || messageInput.getText().isBlank()) return;
-            messageToSend = "EDIT;" + client.getMyLogin() + ";" +message.getText()+";" + message.getId() + ";" + t;
-            System.out.println(messageToSend);
+            messageToSend = "EDIT;" + client.getMyLogin() + ";" + message.getText() + ";" + message.getId() + ";" + t;
             client.sendMessage(messageToSend);
         }
     }
 
-
-
-    /**
-     * Stub for attachment logic (not implemented yet).
-     */
     public void attach(MouseEvent mouseEvent) {
         FileDialog dialog = new FileDialog((Frame) null, "Select File to Open");
         dialog.setMode(FileDialog.LOAD);
@@ -496,15 +587,15 @@ public class ChatController {
             if (mimeType != null && mimeType.startsWith("image")) {
                 System.out.println("This is a photo");
 
-                FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/file_sending.fxml"));
+                FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/image_sending.fxml"));
                 Parent root = loader.load();
 
 
-                FileSendingController fileSendingController = loader.getController();
+                ImageSendingController imageSendingController = loader.getController();
 
 
                 Image image = new Image(file.toURI().toString());
-                fileSendingController.setImageForSending(image);
+                imageSendingController.setImageForSending(image);
 
 
                 Stage primstage = new Stage();
@@ -521,12 +612,40 @@ public class ChatController {
                 primstage.initModality(Modality.APPLICATION_MODAL);
                 primstage.showAndWait();
 
-                if(fileSendingController.isSendConfirmed()){
+                if(imageSendingController.isSendConfirmed()){
                     currentlySendedFile = file;
                     sending("", null);
                 }
             } else {
                 System.out.println("This is a file");
+                FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/file_sending.fxml"));
+                Parent root = loader.load();
+
+
+                FileSendingController fileSendingController = loader.getController();
+                fileSendingController.setText_input_file_sending(messageInput.getText());
+
+                fileSendingController.setFile(file);
+
+                Stage primstage = new Stage();
+                primstage.getIcons().add(new Image(
+                        Objects.requireNonNull(MainLogin.class.getResourceAsStream("/img/mini_logo.png"))
+                ));
+                primstage.setTitle("Echo | File sending");
+
+                Scene scene = new Scene(root);
+                primstage.setScene(scene);
+                primstage.setHeight(260);
+                primstage.setWidth(415);
+                primstage.setResizable(false);
+                primstage.initModality(Modality.APPLICATION_MODAL);
+                primstage.showAndWait();
+
+                if(fileSendingController.isSendConfirmed()){
+                    currentlySendedFile = file;
+                    messageInput.setText(fileSendingController.getText_input_file_sending());
+                    sending("", null);
+                }
 
             }
 
