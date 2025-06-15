@@ -14,6 +14,8 @@ public class Message {
     // Message text content
     private StringProperty text;
 
+    private boolean isImage;
+
     // Whether the message was sent by the current user
     private boolean fromMe;
 
@@ -60,6 +62,15 @@ public class Message {
         this.time = time;
         this.id = id;
         this.f=f;
+    }
+    public Message(String text, boolean fromMe, String senderLogin, OffsetDateTime time, Long id, File f, boolean isImage) {
+        this.text = new SimpleStringProperty(text);
+        this.fromMe = fromMe;
+        this.senderLogin = senderLogin;
+        this.time = time;
+        this.id = id;
+        this.f=f;
+        this.isImage=isImage;
     }
 
 
@@ -115,4 +126,7 @@ public class Message {
         return text;
     }
 
+    public boolean isImage() {
+        return isImage;
+    }
 }
