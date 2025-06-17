@@ -305,6 +305,7 @@ public class ChatController {
 
                 File file = null;
                 byte[] fileBytes = rs.getBytes("inside");
+                String name = rs.getString("file_name");
                 String extension = rs.getString("extension");
 
                 if (fileBytes != null && fileBytes.length > 0 && extension != null) {
@@ -312,7 +313,12 @@ public class ChatController {
                         extension = "." + extension;
                     }
 
-                    file = File.createTempFile("img_" + messageID, extension);
+                    assert name != null;
+                    Path tempDir = Files.createTempDirectory("chat_attachments");
+                    Path filePath = tempDir.resolve(name);
+                    Files.write(filePath, fileBytes);
+                    file = filePath.toFile();
+                    file.deleteOnExit();
                     try (FileOutputStream fos = new FileOutputStream(file)) {
                         fos.write(fileBytes);
                     }
@@ -340,7 +346,7 @@ public class ChatController {
      */
     private void startClientMessageListener(User target) {
         client.setMessageListener(message -> {
-            String[] parts = message.split(";", 8);
+            String[] parts = message.split(";", 9);
             if (parts.length < 5) return;
             String flag = parts[1];
             String sender;
@@ -356,9 +362,10 @@ public class ChatController {
                 File tempFile = null;
                 boolean isImage = false;
 
-                if (parts.length > 6) {
+                if (parts.length > 7) {
                     String base64File = parts[6];
-                    String extension = parts[7].toLowerCase();
+                    String fileName = parts[7];
+                    String extension = parts[8].toLowerCase();
 
                     if (base64File != null && !base64File.isEmpty()) {
                         try {
@@ -369,7 +376,13 @@ public class ChatController {
                                 tempSuffix = "." + tempSuffix;
                             }
 
-                            tempFile = File.createTempFile("file_", tempSuffix);
+
+
+                            Path tempDir = Files.createTempDirectory("chat_attachments");
+                            Path filePath = tempDir.resolve(fileName);
+                            Files.write(filePath, fileBytes);
+                            tempFile = filePath.toFile();
+                            tempFile.deleteOnExit();
                             try (FileOutputStream fos = new FileOutputStream(tempFile)) {
                                 fos.write(fileBytes);
                             }
@@ -390,7 +403,6 @@ public class ChatController {
                 boolean finalIsImage = isImage;
 
                 Platform.runLater(() -> {
-                    System.out.println("Received file: " + finalTempFile + " isImage=" + finalIsImage);
 
                     messageList.add(new Message(text, sender.equals(client.getMyLogin()), sender, time, Long.parseLong(messageID), finalTempFile, finalIsImage));
                 });
@@ -534,7 +546,7 @@ public class ChatController {
                             String base64File = (fileBytes != null) ? Base64.getEncoder().encodeToString(fileBytes) : "";
 
 
-                            messageToSend = "NEW;" + client.getMyLogin() + ";" + msg + ";" + generatedId + ";" + formattedTime + ";" + base64File + ";" + extension;
+                            messageToSend = "NEW;" + client.getMyLogin() + ";" + msg + ";" + generatedId + ";" + formattedTime + ";" + base64File + ";" +fileName+";"+ extension;
 
                             Message newMessage = new Message(msg, true, client.getMyLogin(), t, generatedId, currentlySendedFile);
                             messageList.add(newMessage);
